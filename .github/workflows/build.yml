@@ -1,1 +1,25 @@
 
+name: Build APK
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v3
+        with:
+          distribution: zulu
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.6'
+      - run: |
+          printf "name: cute_chat\npublish_to: none\nversion: 1.0.0\n\nenvironment:\n sdk: '>=3.0.0 <4.0.0'\ndependencies:\n flutter:\n sdk: flutter\nflutter:\n uses-material-design: true\n" > pubspec.yaml
+          mkdir -p lib
+          printf "import 'package:flutter/material.dart';\nvoid main()=>runApp(MaterialApp(home:Scaffold(body:Center(child:Text('هلا نورتي 🥰')))));" > lib/main.dart
+          flutter create. --overwrite
+          flutter build apk --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: APK
+          path: build/app/outputs/flutter-apk/app-release.apk
